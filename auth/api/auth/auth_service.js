@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const dateTimeHelper = require('../../helpers/datetime')
 
 const jsonFile = path.join(__dirname, '../../auth.json')
 
@@ -22,20 +23,9 @@ const CreateUser = (phone, name, role) => {
 
     fs.writeFileSync(jsonFile, users, 'utf8')
 
+    user.createdAt = dateTimeHelper.DateNumberConverter(user.createdAt)
+
     return user
-}
-
-const CheckUser = (phone) => {
-    let users = GetUsers()
-    let isUserExist = false
-
-    users.forEach(user => {
-        if (user.phone == phone && !isUserExist) {
-            isUserExist = true
-        }
-    });
-
-    return isUserExist
 }
 
 const GetUsers = () => {
@@ -56,9 +46,22 @@ const GeneratePassword = (length) => {
     return password
 }
 
+const GetUser = (phone) => {
+    let users = GetUsers()
+    let userData = null
+
+    users.forEach(user => {
+        if(!userData && user.phone == phone) {
+            userData = user
+        }
+    })
+
+    return userData
+}
+
 module.exports = {
     CreateUser,
     GetUsers,
-    CheckUser,
-    GeneratePassword
+    GeneratePassword,
+    GetUser
 }

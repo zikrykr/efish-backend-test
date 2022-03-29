@@ -1,4 +1,5 @@
 const svc = require('./auth_service')
+const authHelper = require('../../helpers/authentication')
 
 const register = (req, res) => {
     const {
@@ -31,7 +32,7 @@ const register = (req, res) => {
         })
     }
 
-    const isUserExist = svc.CheckUser(phone)
+    const isUserExist = svc.GetUser(phone)
 
     if (isUserExist) {
         return res.json({
@@ -46,6 +47,51 @@ const register = (req, res) => {
     return res.json(result)
 }
 
+const login = (req, res) => {
+    const { phone, password } = req.body
+
+    if (!phone) {
+        return res.status(401).json({
+            error: {
+                message: "phone is required"
+            }
+        })
+    }
+
+    if (!password) {
+        return res.status(401).json({
+            error: {
+                message: "password is required"
+            }
+        })
+    }
+
+    const user = svc.GetUser(phone)
+    if (!user) {
+        return res.json({
+            error: {
+                message: "user not found"
+            }
+        })
+    }
+
+    if (user.password != password) {
+        return res.json({
+            error: {
+                message: "wrong password"
+            }
+        })
+    }
+
+    const accessToken = authHelper.GenerateAccessToken(user.name, user.phone, user.role, user.createdAt)
+
+    return res.json({
+        phone: user.phone,
+        accessToken: accessToken
+    })
+}
+
 module.exports = {
-    register
+    register,
+    login
 }
