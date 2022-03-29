@@ -1,7 +1,7 @@
 const svc = require('./auth_service')
 const authHelper = require('../../helpers/authentication')
 
-const register = (req, res) => {
+const Register = (req, res) => {
     const {
         phone = null,
         name = null,
@@ -47,7 +47,7 @@ const register = (req, res) => {
     return res.json(result)
 }
 
-const login = (req, res) => {
+const Login = (req, res) => {
     const { phone, password } = req.body
 
     if (!phone) {
@@ -91,7 +91,29 @@ const login = (req, res) => {
     })
 }
 
+const Verify = (req, res) => {
+    const token = authHelper.GetToken(req)
+    if(!token) {
+        return res.status(401).json({
+            error: {
+                message: "authorization required"
+            }
+        })
+    }
+
+    const privateClaim = authHelper.JWTClaim(token)
+    if(!privateClaim) {
+        return res.status(403).json({
+            error: {
+                message: "invalid token"
+            }
+        })
+    }
+    return res.json(privateClaim)
+}
+
 module.exports = {
-    register,
-    login
+    Register,
+    Login,
+    Verify
 }

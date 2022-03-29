@@ -4,11 +4,15 @@ var router = express.Router();
 const authController = require('../api/auth/auth_controller')
 
 router.post('/register', (req, res, next) => {
-  return authController.register(req, res)
+  return authController.Register(req, res)
 });
 
 router.post('/login', (req, res, next) => {
-  return authController.login(req, res)
+  return authController.Login(req, res)
+})
+
+router.get('/verify', (req, res, next) => {
+  return authController.Verify(req, res)
 })
 
 module.exports = router;
