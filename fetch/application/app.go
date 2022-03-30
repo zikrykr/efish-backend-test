@@ -6,6 +6,7 @@ import (
 	"fetch/api/fetch"
 	"fetch/cache"
 	"fetch/config"
+	customMiddleware "fetch/middleware"
 	"net/http"
 	"os"
 	"os/signal"
@@ -39,8 +40,8 @@ func (app *App) initRoutes() {
 	fetchController := fetch.NewController(app.E, fetchService)
 
 	v1 := app.E.Group("/v1/fetch")
-	v1.GET("/resources", fetchController.HandleGetResources)
-	v1.GET("/resources/aggregate", fetchController.HandleGetResourceAggregate)
+	v1.GET("/resources", fetchController.HandleGetResources, customMiddleware.DecodeToken())
+	v1.GET("/resources/aggregate", fetchController.HandleGetResourceAggregate, customMiddleware.DecodeTokenAdmin())
 }
 
 func (app *App) initCache() {
