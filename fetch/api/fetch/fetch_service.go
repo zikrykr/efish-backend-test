@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"sort"
 	"strconv"
 
 	"gopkg.in/guregu/null.v4"
@@ -166,14 +167,21 @@ func (svc *service) GetResourcesAggregate(ctx context.Context) ([]model.Resource
 				Median:     v.Price,
 				TotalPrice: v.Price,
 				TotalData:  1,
+				Prices:     []float64{v.Price},
 			})
 		} else {
 			totalData := resourceAggregate.TotalData + 1
 			totalPrice := resourceAggregate.TotalPrice + v.Price
+			prices := append(resourceAggregate.Prices, v.Price)
 
 			min := calcMin(resourceAggregate.Min, v.Price)
 			max := calcMax(resourceAggregate.Max, v.Price)
 			avg := calcAvg(totalPrice, totalData)
+
+			median := resourceAggregate.Median
+			if len(prices) > 0 {
+				median = calcMedian(prices, totalData)
+			}
 
 			result = append(result[:index], result[index+1:]...)
 			result = append(result, model.ResourceDataAggregate{
@@ -183,8 +191,10 @@ func (svc *service) GetResourcesAggregate(ctx context.Context) ([]model.Resource
 				Min:        min,
 				Max:        max,
 				Avg:        avg,
+				Median:     median,
 				TotalPrice: totalPrice,
 				TotalData:  totalData,
+				Prices:     prices,
 			})
 		}
 	}
@@ -226,4 +236,19 @@ func calcMax(current, target float64) float64 {
 
 func calcAvg(totalPrice float64, totalData int) float64 {
 	return totalPrice / float64(totalData)
+}
+
+func calcMedian(prices []float64, totalData int) float64 {
+	sort.Float64s(prices)
+
+	medianIndex := totalData - 1
+
+	if totalData%2 > 0 {
+		return prices[medianIndex/2]
+	} else {
+		a := prices[medianIndex/2]
+		b := prices[(medianIndex/2)+1]
+
+		return (a + b) / 2
+	}
 }
