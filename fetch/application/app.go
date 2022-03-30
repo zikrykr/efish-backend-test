@@ -4,6 +4,7 @@ import (
 	"context"
 	"fetch/api/currency"
 	"fetch/api/fetch"
+	"fetch/api/token"
 	"fetch/cache"
 	"fetch/config"
 	customMiddleware "fetch/middleware"
@@ -34,14 +35,19 @@ func New(config *config.Config) *App {
 }
 
 func (app *App) initRoutes() {
+	tokenDecoder := token.NewDecoder()
+
 	currencyService := currency.NewService(&http.Client{Timeout: 10 * time.Second})
 	fetchService := fetch.NewService(&http.Client{Timeout: 10 * time.Second}, currencyService)
 
 	fetchController := fetch.NewController(app.E, fetchService)
+	tokenController := token.NewController(app.E, tokenDecoder)
 
 	v1 := app.E.Group("/v1/fetch")
-	v1.GET("/resources", fetchController.HandleGetResources, customMiddleware.DecodeToken())
-	v1.GET("/resources/aggregate", fetchController.HandleGetResourceAggregate, customMiddleware.DecodeTokenAdmin())
+	v1.GET("/resources", fetchController.HandleGetResources, customMiddleware.DecodeToken(tokenDecoder))
+	v1.GET("/resources/aggregate", fetchController.HandleGetResourceAggregate, customMiddleware.DecodeTokenAdmin(tokenDecoder))
+
+	v1.GET("/verify-token", tokenController.HandleVerifyJWT)
 }
 
 func (app *App) initCache() {

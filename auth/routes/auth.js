@@ -11,7 +11,7 @@ router.post('/login', (req, res, next) => {
   return authController.Login(req, res)
 })
 
-router.get('/verify', (req, res, next) => {
+router.get('/verify-token', (req, res, next) => {
   return authController.Verify(req, res)
 })
 
