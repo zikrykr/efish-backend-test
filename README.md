@@ -92,5 +92,6 @@ http://localhost:port/api/v1/fetch/resources/aggregate</br>
 http://localhost:port/api/v1/fetch/verify-token
 
 
-## Diagram
+## Apps Diagram
 
+![Context Diagram](https://raw.githubusercontent.com/zikrykr/efish-backend-test/main/app%2Bdiagram.jpg)
