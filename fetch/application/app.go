@@ -36,6 +36,7 @@ func (app *App) initRoutes() {
 
 	v1 := app.E.Group("/v1/fetch")
 	v1.GET("/resources", fetchController.HandleGetResources)
+	v1.GET("/resources/aggregate", fetchController.HandleGetResourceAggregate)
 }
 
 // Start the server and handle graceful shutdown

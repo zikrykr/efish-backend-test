@@ -24,3 +24,22 @@ type ResourceData struct {
 	Timestamp null.String `json:"timestamp"`
 	PriceUSD  null.String `json:"price_usd"`
 }
+
+type ResourceDataAggregate struct {
+	Province   string  `json:"area_provinsi"`
+	Week       int     `json:"minggu"`
+	Year       int     `json:"tahun"`
+	Min        float64 `json:"min"`
+	Max        float64 `json:"max"`
+	Avg        float64 `json:"avg"`
+	Median     float64 `json:"median"`
+	TotalPrice float64 `json:"totalPrice"`
+	TotalData  int     `json:"totalData"`
+}
+
+type ResourcePrice struct {
+	Province string  `json:"area_provinsi"`
+	Week     int     `json:"minggu"`
+	Year     int     `json:"tahun"`
+	Price    float64 `json:"price"`
+}

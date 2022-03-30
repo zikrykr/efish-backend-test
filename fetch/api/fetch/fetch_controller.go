@@ -2,6 +2,7 @@ package fetch
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -25,6 +26,17 @@ func (ctl *FetchController) HandleGetResources(c echo.Context) error {
 	ctx := c.Request().Context()
 	result, err := ctl.fetchService.GetResources(ctx)
 	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+func (ctl *FetchController) HandleGetResourceAggregate(c echo.Context) error {
+	ctx := c.Request().Context()
+	result, err := ctl.fetchService.GetResourcesAggregate(ctx)
+	if err != nil {
+		log.Println(err)
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
