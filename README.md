@@ -43,6 +43,7 @@ docker compose up --build
 
 Second, is to run the application with `npm start`
 ```
+npm i
 npm start
 ```
 
