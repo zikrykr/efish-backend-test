@@ -2,7 +2,9 @@ package application
 
 import (
 	"context"
+	"fetch/api/currency"
 	"fetch/api/fetch"
+	"fetch/cache"
 	"fetch/config"
 	"net/http"
 	"os"
@@ -24,19 +26,28 @@ func New(config *config.Config) *App {
 		E:      echo.New(),
 	}
 
+	app.initCache()
 	app.initRoutes()
 
 	return app
 }
 
 func (app *App) initRoutes() {
-	fetchService := fetch.NewService(&http.Client{Timeout: 10 * time.Second})
+	currencyService := currency.NewService(&http.Client{Timeout: 10 * time.Second})
+	fetchService := fetch.NewService(&http.Client{Timeout: 10 * time.Second}, currencyService)
 
 	fetchController := fetch.NewController(app.E, fetchService)
 
 	v1 := app.E.Group("/v1/fetch")
 	v1.GET("/resources", fetchController.HandleGetResources)
 	v1.GET("/resources/aggregate", fetchController.HandleGetResourceAggregate)
+}
+
+func (app *App) initCache() {
+	cache := cache.NewCache()
+	duration := time.NewTicker(time.Duration(app.config.CacheDuration) * time.Minute)
+
+	go cache.Start(duration)
 }
 
 // Start the server and handle graceful shutdown

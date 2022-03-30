@@ -15,6 +15,8 @@ type Config struct {
 	ResourceUrl             string `envconfig:"RESOURCE_URL"`
 	CurrencyConverterApiKey string `envconfig:"CURRENCY_CONVERTER_API_KEY"`
 	CurrencyConverterUrl    string `envconfig:"CURRENCY_CONVERTER_URL"`
+
+	CacheDuration int `envconfig:"CACHE_DURATION"`
 }
 
 var c Config

@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fetch/api/currency"
+	"fetch/cache"
 	"fetch/config"
 	"fetch/helper"
 	"fetch/model"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -18,12 +19,14 @@ import (
 )
 
 type service struct {
-	client *http.Client
+	client         *http.Client
+	currenyService currency.CurrencyService
 }
 
-func NewService(client *http.Client) FetchService {
+func NewService(client *http.Client, currencyService currency.CurrencyService) FetchService {
 	return &service{
-		client: client,
+		client:         client,
+		currenyService: currencyService,
 	}
 }
 
@@ -111,18 +114,13 @@ func (svc *service) GetResources(ctx context.Context) (*[]model.ResourceData, er
 }
 
 func (svc *service) GetCurrencyConverter(ctx context.Context) (*model.CurrencyConverter, error) {
-	var (
-		url    = fmt.Sprintf("%s?q=USD_IDR&compact=ultra&apiKey=%s", conf.CurrencyConverterUrl, conf.CurrencyConverterApiKey)
-		result model.CurrencyConverter
-	)
-
-	err := svc.sendGetRequest(url, &result)
-	if err != nil {
-		log.Println(err)
-		return nil, err
+	if cache.CurrencyConverterResult != 0 {
+		return &model.CurrencyConverter{
+			Value: cache.CurrencyConverterResult,
+		}, nil
+	} else {
+		return svc.currenyService.GetCurrencyConverter(ctx)
 	}
-
-	return &result, nil
 }
 
 func (svc *service) GetResourcesAggregate(ctx context.Context) ([]model.ResourceDataAggregate, error) {
