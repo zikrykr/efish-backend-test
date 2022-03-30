@@ -1,0 +1,14 @@
+version: "2"
+
+services:
+  fetch:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file: .env
+    container_name: "efishery-backend-fetch"
+    command: gin -i -p ${GIN_PORT} -a ${APP_PORT}
+    volumes:
+      - .:/usr/app
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
